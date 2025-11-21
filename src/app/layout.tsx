@@ -1,5 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { Inter } from 'next/font/google'
+
+const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
 // Sayfa meta verileri
 export const metadata: Metadata = {
@@ -55,6 +58,14 @@ export default function RootLayout({
   return (
     <html className="scroll-smooth">
       <head>
+        {/* Viewport & PWA/Mobile meta tags */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#4caf50" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="format-detection" content="telephone=no" />
+
         {/* Favicon ve diğer meta taglar */}
         <link rel="icon" type="image/png" href="/favicon.png" />
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -201,7 +212,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased">
+      <body className={`antialiased ${inter.className}`}>
         {children}
       </body>
     </html>

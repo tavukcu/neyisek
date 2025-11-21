@@ -49,6 +49,13 @@
   --primary-stone-light: #fafaf9;
 }
 
+/* Mobile touch improvements */
+html, body { -webkit-tap-highlight-color: transparent; }
+
+/* Safe area utilities */
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.safe-top { padding-top: env(safe-area-inset-top, 0px); }
+
 /* Container Responsive */
 .container-responsive {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
