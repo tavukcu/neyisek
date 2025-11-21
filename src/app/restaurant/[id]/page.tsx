@@ -606,14 +606,16 @@ export default function RestaurantDetailPage() {
 
       {/* Floating Cart Button (Mobile) */}
       {cartItemCount > 0 && (
-        <div className="fixed bottom-4 right-4 xl:hidden z-50">
-          <button className="bg-primary-600 text-white p-4 rounded-full shadow-lg hover:bg-primary-700 transition-colors">
-            <div className="relative">
-              <ShoppingCart className="h-6 w-6" />
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {cartItemCount}
-              </span>
-            </div>
+        <div className="fixed right-4 bottom-24 z-[60] xl:hidden safe-bottom" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) / 2)' }}>
+          <button
+            aria-label="Sepete git"
+            onClick={() => router.push('/cart')}
+            className="bg-primary-600 text-white p-4 rounded-full shadow-lg hover:bg-primary-700 transition-colors relative"
+          >
+            <ShoppingCart className="h-6 w-6" />
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {cartItemCount}
+            </span>
           </button>
         </div>
       )}
