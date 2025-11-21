@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Inter } from 'next/font/google'
+import MobileBottomNav from '@/components/MobileBottomNav'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
@@ -214,6 +215,7 @@ export default function RootLayout({
       </head>
       <body className={`antialiased ${inter.className}`}>
         {children}
+        <MobileBottomNav />
       </body>
     </html>
   )
