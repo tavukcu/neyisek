@@ -85,12 +85,19 @@ export function useCart() {
     }
   }, [isClient, refreshTrigger]);
 
-  // Sepet değiştiğinde localStorage'a kaydediyoruz
+  // Sepet değiştiğinde localStorage'a kaydet ve güncelleme eventi yayınla
   useEffect(() => {
     if (!isClient) return;
     
     console.log('🛒 useCart - Saving cart to localStorage:', cartItems.length);
     localStorage.setItem('neyisek-cart', JSON.stringify(cartItems));
+    
+    try {
+      const event = new CustomEvent('cartUpdated', { detail: { count: cartItems.reduce((t, i) => t + i.quantity, 0) } });
+      window.dispatchEvent(event);
+    } catch (e) {
+      // no-op
+    }
   }, [cartItems, isClient]);
 
   // Sepete ürün ekleme fonksiyonu

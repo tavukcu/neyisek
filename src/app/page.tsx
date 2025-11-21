@@ -51,6 +51,7 @@ import RestaurantStatusBadge from '@/components/RestaurantStatusBadge';
 import OrderButton from '@/components/OrderButton';
 import NotificationButton from '@/components/NotificationButton';
 import JoinVendorModal from '@/components/JoinVendorModal';
+import { useCart } from '@/hooks/useCart';
 
 
 // Ana sayfa komponenti
@@ -70,6 +71,9 @@ export default function HomePage() {
   const [locationLoading, setLocationLoading] = useState(false);
   const [showNearbySection, setShowNearbySection] = useState(false);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  // Sepet sayacı
+  const { totalItems } = useCart();
 
   // Firebase Analytics ve Performance Monitoring
   useEffect(() => {
@@ -1115,13 +1119,13 @@ export default function HomePage() {
       {/* Mobile Bottom Tab Bar */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-[61] safe-bottom" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <div className="mx-auto max-w-screen-md">
-          <div className="m-3 rounded-2xl bg-white/95 backdrop-blur-md border border-gray-200/70 shadow-2xl">
+          <div className="m-3 rounded-2xl bg-white/95 backdrop-blur-md border border-gray-200/70 shadow-2xl pointer-events-auto">
             <div className="grid grid-cols-5">
-              <Link href="/" className="flex flex-col items-center justify-center py-3 text-gray-700 hover:text-green-600">
+              <Link href="/" className="relative flex flex-col items-center justify-center py-3 text-gray-700 hover:text-green-600">
                 <Home className="h-5 w-5" />
                 <span className="text-[11px] font-medium">Ana Sayfa</span>
               </Link>
-              <Link href="/menu" className="flex flex-col items-center justify-center py-3 text-gray-700 hover:text-green-600">
+              <Link href="/menu" className="relative flex flex-col items-center justify-center py-3 text-gray-700 hover:text-green-600">
                 <UtensilsCrossed className="h-5 w-5" />
                 <span className="text-[11px] font-medium">Menü</span>
               </Link>
@@ -1129,11 +1133,16 @@ export default function HomePage() {
                 <Filter className="h-5 w-5" />
                 <span className="text-[11px] font-medium">Filtre</span>
               </button>
-              <Link href="/cart" className="flex flex-col items-center justify-center py-3 text-gray-700 hover:text-green-600">
+              <Link href="/cart" className="relative flex flex-col items-center justify-center py-3 text-gray-700 hover:text-green-600">
                 <ShoppingCart className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <span className="absolute top-1 right-[22%] bg-yellow-500 text-gray-900 text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
                 <span className="text-[11px] font-medium">Sepet</span>
               </Link>
-              <Link href="/profile" className="flex flex-col items-center justify-center py-3 text-gray-700 hover:text-green-600">
+              <Link href="/profile" className="relative flex flex-col items-center justify-center py-3 text-gray-700 hover:text-green-600">
                 <User className="h-5 w-5" />
                 <span className="text-[11px] font-medium">Profil</span>
               </Link>
@@ -1147,7 +1156,7 @@ export default function HomePage() {
         aria-label="Konumumu Kullan"
         onClick={getUserLocation}
         disabled={locationLoading}
-        className="lg:hidden fixed right-4 bottom-20 z-[62] inline-flex items-center gap-2 px-4 py-3 rounded-full shadow-2xl text-white font-semibold transition-all duration-300 disabled:opacity-60"
+        className="lg:hidden fixed right-4 bottom-24 z-[60] inline-flex items-center gap-2 px-4 py-3 rounded-full shadow-2xl text-white font-semibold transition-all duration-300 disabled:opacity-60"
         style={{
           background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) / 2)'
