@@ -3,54 +3,53 @@ import { MapPin, Phone, Mail } from "lucide-react";
 
 const footerLinks = {
   platform: [
-    { label: "Hakkımızda", href: "/about" },
-    { label: "Nasıl Çalışır?", href: "/help" },
-    { label: "İletişim", href: "/contact" },
+    { label: "Hakkimizda", href: "/about" },
+    { label: "Nasil Calisir?", href: "/help" },
+    { label: "Iletisim", href: "/contact" },
     { label: "Kariyer", href: "/careers" },
   ],
   partner: [
-    { label: "Restoran Başvurusu", href: "/restaurant-panel" },
+    { label: "Restoran Basvurusu", href: "/restaurant-panel" },
     { label: "Kurye Ol", href: "/courier" },
-    { label: "İş Ortaklığı", href: "/contact" },
+    { label: "Is Ortakligi", href: "/contact" },
   ],
   legal: [
-    { label: "Kullanım Koşulları", href: "/terms" },
-    { label: "Gizlilik Politikası", href: "/privacy" },
+    { label: "Kullanim Kosullari", href: "/terms" },
+    { label: "Gizlilik Politikasi", href: "/privacy" },
     { label: "KVKK", href: "/privacy" },
-    { label: "Çerez Politikası", href: "/privacy" },
+    { label: "Cerez Politikasi", href: "/privacy" },
   ],
 };
 
 export default function Footer() {
   return (
-    <footer className="border-t bg-muted/30">
-      <div className="mx-auto max-w-7xl px-4 py-12">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    <footer className="border-t bg-gray-50">
+      <div className="mx-auto max-w-7xl px-4 py-10 md:py-12">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {/* Brand */}
-          <div>
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-lg">
+          <div className="col-span-2 md:col-span-1">
+            <Link href="/" className="flex items-center gap-2 mb-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
                 N
               </div>
-              <span className="text-xl font-bold">
+              <span className="text-lg font-bold">
                 Ne<span className="text-primary">Yisek</span>
               </span>
             </Link>
-            <p className="text-sm text-muted-foreground mb-4">
-              Türkiye&apos;nin en lezzetli yemek sipariş platformu. Binlerce
-              restorandan kapınıza teslimat.
+            <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+              Turkiye&apos;nin en lezzetli yemek siparis platformu.
             </p>
-            <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                <span>Türkiye geneli hizmet</span>
+            <div className="flex flex-col gap-1.5 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <MapPin className="h-3 w-3 shrink-0" />
+                <span>Turkiye geneli hizmet</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4" />
+              <div className="flex items-center gap-1.5">
+                <Phone className="h-3 w-3 shrink-0" />
                 <span>0850 123 45 67</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4" />
+              <div className="flex items-center gap-1.5">
+                <Mail className="h-3 w-3 shrink-0" />
                 <span>destek@neyisek.com</span>
               </div>
             </div>
@@ -58,13 +57,13 @@ export default function Footer() {
 
           {/* Platform */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold">Platform</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground">Platform</h3>
             <ul className="space-y-2">
               {footerLinks.platform.map((link) => (
                 <li key={link.href + link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -75,13 +74,13 @@ export default function Footer() {
 
           {/* Partner */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold">İş Ortaklığı</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground">Is Ortakligi</h3>
             <ul className="space-y-2">
               {footerLinks.partner.map((link) => (
                 <li key={link.href + link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -92,13 +91,13 @@ export default function Footer() {
 
           {/* Legal */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold">Yasal</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground">Yasal</h3>
             <ul className="space-y-2">
               {footerLinks.legal.map((link) => (
                 <li key={link.href + link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -109,17 +108,16 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t pt-8 sm:flex-row">
-          <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} NeYisek. Tüm hakları saklıdır.
+        <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t pt-6 sm:flex-row">
+          <p className="text-[11px] text-muted-foreground">
+            &copy; {new Date().getFullYear()} NeYisek. Tum haklari saklidir.
           </p>
-          <div className="flex gap-4">
-            <span className="text-xs text-muted-foreground">
-              App Store
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Google Play
-            </span>
+          <div className="flex gap-3">
+            {["Twitter", "Instagram", "LinkedIn"].map((social) => (
+              <span key={social} className="text-[11px] text-muted-foreground hover:text-primary cursor-pointer transition-colors">
+                {social}
+              </span>
+            ))}
           </div>
         </div>
       </div>
