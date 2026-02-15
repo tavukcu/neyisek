@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import {
   Plus,
@@ -12,6 +12,9 @@ import {
   EyeOff,
   Check,
   X,
+  Upload,
+  ImageIcon,
+  Link2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -50,6 +53,8 @@ export default function ProductsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyProduct);
+  const [imageMode, setImageMode] = useState<"file" | "url">("file");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filtered = products.filter((p) => {
     const matchSearch =
@@ -221,13 +226,110 @@ export default function ProductsPage() {
                 </div>
               </div>
 
-              <input
-                type="text"
-                value={form.image}
-                onChange={(e) => setForm({ ...form, image: e.target.value })}
-                placeholder="Gorsel URL (opsiyonel)"
-                className="w-full rounded-lg border bg-background p-2.5 text-sm outline-none focus:border-primary/50"
-              />
+              {/* Image Upload */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <label className="text-[11px] text-muted-foreground">Gorsel</label>
+                  <div className="flex gap-1 rounded-md border p-0.5 ml-auto">
+                    <button
+                      type="button"
+                      onClick={() => setImageMode("file")}
+                      className={`flex items-center gap-1 rounded px-2 py-1 text-[10px] font-medium transition-colors ${
+                        imageMode === "file"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <Upload className="h-3 w-3" />
+                      Dosya
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageMode("url")}
+                      className={`flex items-center gap-1 rounded px-2 py-1 text-[10px] font-medium transition-colors ${
+                        imageMode === "url"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <Link2 className="h-3 w-3" />
+                      URL
+                    </button>
+                  </div>
+                </div>
+
+                {imageMode === "file" ? (
+                  <div className="flex items-center gap-3">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        if (file.size > 2 * 1024 * 1024) {
+                          toast.error("Dosya boyutu max 2MB olmali");
+                          return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          setForm({ ...form, image: ev.target?.result as string });
+                        };
+                        reader.readAsDataURL(file);
+                      }}
+                    />
+                    {form.image && (form.image.startsWith("data:") || form.image.startsWith("http")) ? (
+                      <div className="relative h-16 w-16 rounded-lg overflow-hidden border shrink-0">
+                        <Image
+                          src={form.image}
+                          alt="Onizleme"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed shrink-0">
+                        <ImageIcon className="h-5 w-5 text-muted-foreground/40" />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5 rounded-lg text-xs"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Upload className="h-3.5 w-3.5" />
+                        {form.image ? "Degistir" : "Gorsel Sec"}
+                      </Button>
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        PNG, JPG - Max 2MB
+                      </p>
+                    </div>
+                    {form.image && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
+                        onClick={() => setForm({ ...form, image: "" })}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    value={form.image}
+                    onChange={(e) => setForm({ ...form, image: e.target.value })}
+                    placeholder="https://... gorsel URL'si"
+                    className="w-full rounded-lg border bg-background p-2.5 text-sm outline-none focus:border-primary/50"
+                  />
+                )}
+              </div>
 
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
