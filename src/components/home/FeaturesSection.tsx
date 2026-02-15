@@ -6,53 +6,53 @@ import { motion } from "framer-motion";
 const features = [
   {
     icon: Truck,
-    title: "Hızlı Teslimat",
-    description: "Siparişiniz ortalama 30 dakikada kapınızda. Canlı takip ile anında bilgilenin.",
+    title: "Hizli Teslimat",
+    description: "Siparisiniz ortalama 30 dakikada kapinizda. Canli takip ile aninda bilgilenin.",
   },
   {
     icon: ShieldCheck,
-    title: "Güvenli Ödeme",
-    description: "iyzico altyapısı ile PCI-DSS uyumlu, uçtan uca şifrelenmiş güvenli ödeme.",
+    title: "Guvenli Odeme",
+    description: "iyzico altyapisi ile PCI-DSS uyumlu, uctan uca sifrelenmis guvenli odeme.",
   },
   {
     icon: MapPin,
-    title: "Canlı Takip",
-    description: "Siparişinizi harita üzerinde anlık takip edin, kuryenin konumunu görün.",
+    title: "Canli Takip",
+    description: "Siparisinizi harita uzerinde anlik takip edin, kuryenin konumunu gorun.",
   },
   {
     icon: Sparkles,
-    title: "Akıllı Öneriler",
-    description: "Yapay zeka destekli kişiselleştirilmiş yemek ve restoran önerileri.",
+    title: "Akilli Oneriler",
+    description: "Yapay zeka destekli kisisellestirilmis yemek ve restoran onerileri.",
   },
 ];
 
 export default function FeaturesSection() {
   return (
-    <section className="py-14 md:py-20">
+    <section className="py-12 md:py-16 bg-muted/30">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="mb-12 text-center">
-          <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
+        <div className="mb-8 text-center">
+          <h2 className="text-xl font-bold md:text-2xl">
             Neden <span className="text-primary">NeYisek</span>?
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground md:text-base">
-            Yemek sipariş deneyimini yeniden tanımlayan teknoloji ve kalite
+          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+            Yemek siparis deneyimini yeniden tanimlayan teknoloji ve kalite
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.08 }}
-              className="group rounded-2xl border bg-card p-6 transition-all hover:border-primary/20 hover:shadow-sm"
+              className="rounded-2xl border bg-card p-5 text-center transition-all hover:shadow-sm"
             >
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/[0.06] text-primary transition-colors group-hover:bg-primary/10">
+              <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <feature.icon className="h-5 w-5" strokeWidth={1.8} />
               </div>
-              <h3 className="mb-1.5 text-sm font-semibold">{feature.title}</h3>
-              <p className="text-xs leading-relaxed text-muted-foreground">
+              <h3 className="text-sm font-semibold">{feature.title}</h3>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                 {feature.description}
               </p>
             </motion.div>

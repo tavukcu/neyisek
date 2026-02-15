@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Star, Clock, Bike, Heart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -18,20 +19,32 @@ export default function RestaurantCard({
   isFavorite,
   onToggleFavorite,
 }: RestaurantCardProps) {
-  const isOpen = true; // TODO: calculate from hours
+  const isOpen = true;
   const hasDiscount = restaurant.delivery.fee === 0;
   const CuisineIcon = getCuisineIcon(restaurant.cuisine[0]);
+  const hasCover = !!restaurant.images.cover;
 
   return (
     <Link
       href={`/restaurant/${restaurant.slug}`}
       className="group block overflow-hidden rounded-2xl border bg-card transition-all hover:shadow-lg hover:-translate-y-0.5"
     >
-      {/* Image Placeholder */}
-      <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/[0.06] via-primary/[0.03] to-muted overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <CuisineIcon className="h-12 w-12 text-primary/15 transition-transform group-hover:scale-110" strokeWidth={1.2} />
-        </div>
+      {/* Image */}
+      <div className="relative aspect-[16/9] bg-muted overflow-hidden">
+        {hasCover ? (
+          <Image
+            src={restaurant.images.cover}
+            alt={restaurant.name}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/[0.08] to-muted">
+            <CuisineIcon className="h-12 w-12 text-primary/15" strokeWidth={1.2} />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
         {!isOpen && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
             <span className="rounded-full bg-background px-4 py-1.5 text-sm font-medium">
@@ -40,10 +53,14 @@ export default function RestaurantCard({
           </div>
         )}
         {hasDiscount && (
-          <Badge className="absolute left-3 top-3 z-10 bg-primary">
+          <Badge className="absolute left-3 top-3 z-10 bg-primary text-primary-foreground">
             Ucretsiz Teslimat
           </Badge>
         )}
+        <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-lg bg-black/40 backdrop-blur-sm px-2 py-1">
+          <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+          <span className="text-xs font-semibold text-white">{restaurant.rating.average}</span>
+        </div>
         {onToggleFavorite && (
           <button
             onClick={(e) => {
@@ -51,12 +68,12 @@ export default function RestaurantCard({
               e.stopPropagation();
               onToggleFavorite(restaurant.id);
             }}
-            className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 backdrop-blur transition-colors hover:bg-background"
+            className="absolute right-3 bottom-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur transition-colors hover:bg-white"
           >
             <Heart
               className={cn(
                 "h-4 w-4 transition-colors",
-                isFavorite ? "fill-red-500 text-red-500" : "text-muted-foreground"
+                isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"
               )}
             />
           </button>
@@ -65,25 +82,14 @@ export default function RestaurantCard({
 
       {/* Content */}
       <div className="p-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="font-semibold truncate group-hover:text-primary transition-colors">
-              {restaurant.name}
-            </h3>
-            <p className="mt-0.5 text-xs text-muted-foreground truncate">
-              {restaurant.cuisine.join(" \u2022 ")}
-            </p>
-          </div>
-          <div className="flex items-center gap-1 shrink-0 rounded-lg bg-primary/10 px-2 py-1">
-            <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-            <span className="text-xs font-semibold">{restaurant.rating.average}</span>
-            <span className="text-[10px] text-muted-foreground">
-              ({restaurant.rating.count})
-            </span>
-          </div>
-        </div>
+        <h3 className="font-semibold truncate group-hover:text-primary transition-colors">
+          {restaurant.name}
+        </h3>
+        <p className="mt-0.5 text-xs text-muted-foreground truncate">
+          {restaurant.cuisine.join(" \u2022 ")}
+        </p>
 
-        <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
+        <div className="mt-2.5 flex items-center gap-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" />
             <span>{restaurant.delivery.estimatedTime} dk</span>
@@ -96,7 +102,7 @@ export default function RestaurantCard({
                 : `\u20BA${restaurant.delivery.fee.toFixed(2)}`}
             </span>
           </div>
-          <span>Min. \u20BA{restaurant.delivery.minOrder}</span>
+          <span className="ml-auto text-[11px]">Min. \u20BA{restaurant.delivery.minOrder}</span>
         </div>
       </div>
     </Link>

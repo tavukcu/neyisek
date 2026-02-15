@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +19,7 @@ export default function ProductCard({
   onOpenDetail,
 }: ProductCardProps) {
   const hasDiscount = product.discountPrice && product.discountPrice < product.price;
+  const hasImage = product.images.length > 0 && product.images[0];
   const CategoryIcon = getCategoryIcon(product.categoryId);
 
   return (
@@ -55,18 +57,25 @@ export default function ProductCard({
               {"\u20BA"}{product.price.toFixed(2)}
             </span>
           )}
-          {product.variants.length > 0 && (
-            <span className="text-[10px] text-muted-foreground">
-              {"\u20BA"}{product.variants[0].price.toFixed(2)}&apos;den itibaren
-            </span>
-          )}
         </div>
       </div>
 
       {/* Image & Add Button */}
       <div className="relative shrink-0 w-24 h-24">
-        <div className="h-full w-full rounded-xl bg-gradient-to-br from-primary/[0.06] to-muted flex items-center justify-center overflow-hidden">
-          <CategoryIcon className="h-8 w-8 text-primary/20" strokeWidth={1.2} />
+        <div className="h-full w-full rounded-xl bg-muted overflow-hidden">
+          {hasImage ? (
+            <Image
+              src={product.images[0]}
+              alt={product.name}
+              width={96}
+              height={96}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/[0.06] to-muted">
+              <CategoryIcon className="h-8 w-8 text-primary/20" strokeWidth={1.2} />
+            </div>
+          )}
         </div>
         <Button
           size="icon"

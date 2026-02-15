@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Star,
   Clock,
@@ -77,6 +78,7 @@ export default function RestaurantDetailPage() {
   }
 
   const CoverIcon = getCuisineIcon(restaurant.cuisine[0]);
+  const hasCover = !!restaurant.images.cover;
 
   const handleQuickAdd = (product: Product & { id: string }) => {
     addItem({
@@ -110,52 +112,60 @@ export default function RestaurantDetailPage() {
           className="rounded-2xl border bg-card overflow-hidden"
         >
           {/* Cover */}
-          <div className="relative h-40 md:h-56 bg-gradient-to-br from-primary/[0.08] via-primary/[0.04] to-muted flex items-center justify-center">
-            <CoverIcon className="h-20 w-20 text-primary/10" strokeWidth={0.8} />
+          <div className="relative h-48 md:h-64 bg-muted overflow-hidden">
+            {hasCover ? (
+              <Image
+                src={restaurant.images.cover}
+                alt={restaurant.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1280px) 100vw, 1280px"
+                priority
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/[0.08] to-muted">
+                <CoverIcon className="h-20 w-20 text-primary/10" strokeWidth={0.8} />
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             <div className="absolute right-4 top-4 flex gap-2">
               <Button
                 variant="secondary"
                 size="icon"
-                className="rounded-full h-9 w-9 bg-background/80 backdrop-blur"
+                className="rounded-full h-9 w-9 bg-white/80 backdrop-blur hover:bg-white"
                 onClick={() => {
                   setIsFav(!isFav);
                   toast.success(isFav ? "Favorilerden cikarildi" : "Favorilere eklendi");
                 }}
               >
                 <Heart
-                  className={`h-4 w-4 ${isFav ? "fill-red-500 text-red-500" : ""}`}
+                  className={`h-4 w-4 ${isFav ? "fill-red-500 text-red-500" : "text-gray-700"}`}
                 />
               </Button>
               <Button
                 variant="secondary"
                 size="icon"
-                className="rounded-full h-9 w-9 bg-background/80 backdrop-blur"
+                className="rounded-full h-9 w-9 bg-white/80 backdrop-blur hover:bg-white"
               >
-                <Share2 className="h-4 w-4" />
+                <Share2 className="h-4 w-4 text-gray-700" />
               </Button>
+            </div>
+            <div className="absolute left-6 bottom-4 flex items-center gap-1 rounded-lg bg-black/50 backdrop-blur-sm px-2.5 py-1.5">
+              <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+              <span className="font-bold text-white">{restaurant.rating.average}</span>
+              <span className="text-xs text-white/70">({restaurant.rating.count})</span>
             </div>
           </div>
 
           {/* Info */}
           <div className="p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h1 className="text-2xl font-bold">{restaurant.name}</h1>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {restaurant.cuisine.join(" \u2022 ")}
-                </p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {restaurant.description}
-                </p>
-              </div>
-              <div className="flex items-center gap-1 shrink-0 rounded-xl bg-primary/10 px-3 py-2">
-                <Star className="h-4 w-4 fill-primary text-primary" />
-                <span className="font-bold">{restaurant.rating.average}</span>
-                <span className="text-xs text-muted-foreground">
-                  ({restaurant.rating.count})
-                </span>
-              </div>
-            </div>
+            <h1 className="text-2xl font-bold">{restaurant.name}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {restaurant.cuisine.join(" \u2022 ")}
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {restaurant.description}
+            </p>
 
             <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1.5">

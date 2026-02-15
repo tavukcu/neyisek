@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Minus, Plus, X, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,7 @@ export default function ProductDetailModal({
   if (!product) return null;
 
   const CategoryIcon = getCategoryIcon(product.categoryId);
+  const hasImage = product.images.length > 0 && product.images[0];
 
   const basePrice = selectedVariant
     ? (product.variants.find((v) => v.id === selectedVariant)?.price || product.price)
@@ -80,11 +82,23 @@ export default function ProductDetailModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto p-0">
         {/* Image */}
-        <div className="relative aspect-video bg-gradient-to-br from-primary/[0.08] via-primary/[0.04] to-muted flex items-center justify-center">
-          <CategoryIcon className="h-16 w-16 text-primary/15" strokeWidth={1} />
+        <div className="relative aspect-video bg-muted overflow-hidden">
+          {hasImage ? (
+            <Image
+              src={product.images[0]}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="448px"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/[0.08] to-muted">
+              <CategoryIcon className="h-16 w-16 text-primary/15" strokeWidth={1} />
+            </div>
+          )}
           <button
             onClick={onClose}
-            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 backdrop-blur"
+            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 backdrop-blur text-white"
           >
             <X className="h-4 w-4" />
           </button>
@@ -100,9 +114,9 @@ export default function ProductDetailModal({
                 </p>
               </div>
               {product.rating.count > 0 && (
-                <div className="flex items-center gap-1 shrink-0 rounded-lg bg-primary/10 px-2 py-1">
-                  <Star className="h-3 w-3 fill-primary text-primary" />
-                  <span className="text-xs font-semibold">
+                <div className="flex items-center gap-1 shrink-0 rounded-lg bg-amber-50 px-2 py-1">
+                  <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+                  <span className="text-xs font-semibold text-amber-700">
                     {product.rating.average}
                   </span>
                 </div>
