@@ -3,6 +3,7 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { getCategoryIcon } from "@/lib/icons";
 import type { Product } from "@/types";
 
 interface ProductCardProps {
@@ -17,6 +18,7 @@ export default function ProductCard({
   onOpenDetail,
 }: ProductCardProps) {
   const hasDiscount = product.discountPrice && product.discountPrice < product.price;
+  const CategoryIcon = getCategoryIcon(product.categoryId);
 
   return (
     <div
@@ -31,7 +33,7 @@ export default function ProductCard({
           </h3>
           {product.isPopular && (
             <Badge variant="secondary" className="shrink-0 text-[10px] px-1.5 py-0">
-              Popüler
+              Populer
             </Badge>
           )}
         </div>
@@ -42,20 +44,20 @@ export default function ProductCard({
           {hasDiscount ? (
             <>
               <span className="text-sm font-semibold text-primary">
-                ₺{product.discountPrice?.toFixed(2)}
+                {"\u20BA"}{product.discountPrice?.toFixed(2)}
               </span>
               <span className="text-xs text-muted-foreground line-through">
-                ₺{product.price.toFixed(2)}
+                {"\u20BA"}{product.price.toFixed(2)}
               </span>
             </>
           ) : (
             <span className="text-sm font-semibold">
-              ₺{product.price.toFixed(2)}
+              {"\u20BA"}{product.price.toFixed(2)}
             </span>
           )}
           {product.variants.length > 0 && (
             <span className="text-[10px] text-muted-foreground">
-              ₺{product.variants[0].price.toFixed(2)}&apos;den itibaren
+              {"\u20BA"}{product.variants[0].price.toFixed(2)}&apos;den itibaren
             </span>
           )}
         </div>
@@ -63,16 +65,8 @@ export default function ProductCard({
 
       {/* Image & Add Button */}
       <div className="relative shrink-0 w-24 h-24">
-        <div className="h-full w-full rounded-xl bg-muted flex items-center justify-center text-3xl overflow-hidden">
-          {product.categoryId === "burger"
-            ? "🍔"
-            : product.categoryId === "kebap"
-              ? "🥙"
-              : product.categoryId === "icecekler"
-                ? "🥤"
-                : product.categoryId === "yan-urunler"
-                  ? "🍟"
-                  : "🍽️"}
+        <div className="h-full w-full rounded-xl bg-gradient-to-br from-primary/[0.06] to-muted flex items-center justify-center overflow-hidden">
+          <CategoryIcon className="h-8 w-8 text-primary/20" strokeWidth={1.2} />
         </div>
         <Button
           size="icon"

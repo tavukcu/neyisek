@@ -1,22 +1,23 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, X, TrendingUp, Clock } from "lucide-react";
+import { Search, X, TrendingUp, Clock, SearchX } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import RestaurantCard from "@/components/restaurant/RestaurantCard";
 import { mockRestaurants } from "@/lib/mock-data";
 import { CATEGORIES } from "@/lib/constants";
+import { getCategoryIcon } from "@/lib/icons";
 import { motion, AnimatePresence } from "framer-motion";
 
 const trendingSearches = [
   "Burger",
   "Pizza",
   "Kebap",
-  "Döner",
+  "Doner",
   "Tavuk",
   "Lahmacun",
-  "Çorba",
-  "Tatlı",
+  "Corba",
+  "Tatli",
 ];
 
 export default function SearchPage() {
@@ -94,7 +95,7 @@ export default function SearchPage() {
             <div>
               <h2 className="flex items-center gap-2 text-sm font-semibold mb-3">
                 <TrendingUp className="h-4 w-4" />
-                Popüler Aramalar
+                Populer Aramalar
               </h2>
               <div className="flex flex-wrap gap-2">
                 {trendingSearches.map((s) => (
@@ -114,16 +115,21 @@ export default function SearchPage() {
             <div>
               <h2 className="text-sm font-semibold mb-3">Kategoriler</h2>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
-                {CATEGORIES.slice(0, 6).map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => setQuery(cat.name)}
-                    className="flex flex-col items-center gap-2 rounded-2xl border bg-card p-4 transition-all hover:border-primary/30 hover:shadow-sm"
-                  >
-                    <span className="text-3xl">{cat.icon}</span>
-                    <span className="text-xs font-medium">{cat.name}</span>
-                  </button>
-                ))}
+                {CATEGORIES.slice(0, 6).map((cat) => {
+                  const Icon = getCategoryIcon(cat.id);
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => setQuery(cat.name)}
+                      className="flex flex-col items-center gap-2 rounded-2xl border bg-card p-4 transition-all hover:border-primary/30 hover:shadow-sm"
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/[0.06] text-primary">
+                        <Icon className="h-5 w-5" strokeWidth={1.8} />
+                      </div>
+                      <span className="text-xs font-medium">{cat.name}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </motion.div>
@@ -136,8 +142,8 @@ export default function SearchPage() {
           >
             <p className="mb-4 text-sm text-muted-foreground">
               {results.length > 0
-                ? `"${query}" için ${results.length} sonuç`
-                : `"${query}" için sonuç bulunamadı`}
+                ? `"${query}" icin ${results.length} sonuc`
+                : `"${query}" icin sonuc bulunamadi`}
             </p>
 
             {results.length > 0 ? (
@@ -148,10 +154,10 @@ export default function SearchPage() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <span className="text-5xl mb-4">🤷</span>
-                <h3 className="text-lg font-semibold">Sonuç bulunamadı</h3>
+                <SearchX className="h-12 w-12 text-muted-foreground/30 mb-4" />
+                <h3 className="text-lg font-semibold">Sonuc bulunamadi</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Farklı bir arama terimi deneyin
+                  Farkli bir arama terimi deneyin
                 </p>
               </div>
             )}

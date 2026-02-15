@@ -13,6 +13,9 @@ import {
   Share2,
   ArrowLeft,
   Info,
+  Search,
+  MessageSquare,
+  ClipboardList,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +24,7 @@ import { Separator } from "@/components/ui/separator";
 import ProductCard from "@/components/restaurant/ProductCard";
 import ProductDetailModal from "@/components/restaurant/ProductDetailModal";
 import { mockRestaurants, getMockProducts } from "@/lib/mock-data";
+import { getCuisineIcon } from "@/lib/icons";
 import { useCartStore } from "@/stores/cart.store";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -50,27 +54,29 @@ export default function RestaurantDetailPage() {
   const categoryNames: Record<string, string> = {
     burger: "Burgerler",
     kebap: "Kebaplar",
-    "yan-urunler": "Yan Ürünler",
-    icecekler: "İçecekler",
+    "yan-urunler": "Yan Urunler",
+    icecekler: "Icecekler",
     pizza: "Pizzalar",
     pide: "Pideler",
-    tatli: "Tatlılar",
+    tatli: "Tatlilar",
   };
 
   if (!restaurant) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <span className="text-5xl mb-4">🔍</span>
-        <h2 className="text-xl font-semibold">Restoran bulunamadı</h2>
+        <Search className="h-12 w-12 text-muted-foreground/30 mb-4" />
+        <h2 className="text-xl font-semibold">Restoran bulunamadi</h2>
         <Link href="/menu">
           <Button variant="outline" className="mt-4 gap-2">
             <ArrowLeft className="h-4 w-4" />
-            Restoranlara Dön
+            Restoranlara Don
           </Button>
         </Link>
       </div>
     );
   }
+
+  const CoverIcon = getCuisineIcon(restaurant.cuisine[0]);
 
   const handleQuickAdd = (product: Product & { id: string }) => {
     addItem({
@@ -104,10 +110,8 @@ export default function RestaurantDetailPage() {
           className="rounded-2xl border bg-card overflow-hidden"
         >
           {/* Cover */}
-          <div className="relative h-40 md:h-56 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-            <span className="text-7xl opacity-30">
-              {restaurant.cuisine[0] === "Burger" ? "🍔" : restaurant.cuisine[0] === "Pizza" ? "🍕" : restaurant.cuisine[0] === "Kebap" ? "🥙" : "🍽️"}
-            </span>
+          <div className="relative h-40 md:h-56 bg-gradient-to-br from-primary/[0.08] via-primary/[0.04] to-muted flex items-center justify-center">
+            <CoverIcon className="h-20 w-20 text-primary/10" strokeWidth={0.8} />
             <div className="absolute right-4 top-4 flex gap-2">
               <Button
                 variant="secondary"
@@ -115,7 +119,7 @@ export default function RestaurantDetailPage() {
                 className="rounded-full h-9 w-9 bg-background/80 backdrop-blur"
                 onClick={() => {
                   setIsFav(!isFav);
-                  toast.success(isFav ? "Favorilerden çıkarıldı" : "Favorilere eklendi");
+                  toast.success(isFav ? "Favorilerden cikarildi" : "Favorilere eklendi");
                 }}
               >
                 <Heart
@@ -138,7 +142,7 @@ export default function RestaurantDetailPage() {
               <div>
                 <h1 className="text-2xl font-bold">{restaurant.name}</h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {restaurant.cuisine.join(" • ")}
+                  {restaurant.cuisine.join(" \u2022 ")}
                 </p>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {restaurant.description}
@@ -162,8 +166,8 @@ export default function RestaurantDetailPage() {
                 <Bike className="h-4 w-4 text-primary" />
                 <span>
                   {restaurant.delivery.fee === 0
-                    ? "Ücretsiz Teslimat"
-                    : `₺${restaurant.delivery.fee.toFixed(2)} teslimat`}
+                    ? "Ucretsiz Teslimat"
+                    : `\u20BA${restaurant.delivery.fee.toFixed(2)} teslimat`}
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
@@ -184,9 +188,9 @@ export default function RestaurantDetailPage() {
                 <Badge variant="secondary">Gel Al</Badge>
               )}
               {restaurant.features.acceptsCard && (
-                <Badge variant="secondary">Kredi Kartı</Badge>
+                <Badge variant="secondary">Kredi Karti</Badge>
               )}
-              <Badge variant="outline">Min. ₺{restaurant.delivery.minOrder}</Badge>
+              <Badge variant="outline">Min. {"\u20BA"}{restaurant.delivery.minOrder}</Badge>
             </div>
           </div>
         </motion.div>
@@ -196,7 +200,7 @@ export default function RestaurantDetailPage() {
           <Tabs defaultValue="menu">
             <TabsList className="w-full justify-start rounded-xl bg-muted/50">
               <TabsTrigger value="menu" className="rounded-lg">
-                Menü
+                Menu
               </TabsTrigger>
               <TabsTrigger value="info" className="rounded-lg">
                 Bilgiler
@@ -226,8 +230,8 @@ export default function RestaurantDetailPage() {
               ))}
               {products.length === 0 && (
                 <div className="text-center py-12 text-muted-foreground">
-                  <span className="text-4xl block mb-2">📋</span>
-                  Henüz menü eklenmemiş
+                  <ClipboardList className="mx-auto h-10 w-10 text-muted-foreground/30 mb-3" />
+                  <p className="text-sm">Henuz menu eklenmemis</p>
                 </div>
               )}
             </TabsContent>
@@ -237,15 +241,15 @@ export default function RestaurantDetailPage() {
                 <div>
                   <h3 className="font-semibold flex items-center gap-2">
                     <Info className="h-4 w-4 text-primary" />
-                    Çalışma Saatleri
+                    Calisma Saatleri
                   </h3>
                   <div className="mt-2 space-y-1 text-sm">
                     {Object.entries(restaurant.hours).map(([day, hours]) => {
                       const dayNames: Record<string, string> = {
                         monday: "Pazartesi",
-                        tuesday: "Salı",
-                        wednesday: "Çarşamba",
-                        thursday: "Perşembe",
+                        tuesday: "Sali",
+                        wednesday: "Carsamba",
+                        thursday: "Persembe",
                         friday: "Cuma",
                         saturday: "Cumartesi",
                         sunday: "Pazar",
@@ -261,7 +265,7 @@ export default function RestaurantDetailPage() {
                           <span className={hours.isOpen ? "" : "text-destructive"}>
                             {hours.isOpen
                               ? `${hours.open} - ${hours.close}`
-                              : "Kapalı"}
+                              : "Kapali"}
                           </span>
                         </div>
                       );
@@ -277,7 +281,7 @@ export default function RestaurantDetailPage() {
                 </div>
                 <Separator />
                 <div>
-                  <h3 className="font-semibold mb-2">İletişim</h3>
+                  <h3 className="font-semibold mb-2">Iletisim</h3>
                   <p className="text-sm text-muted-foreground">
                     {restaurant.contact.phone}
                   </p>
@@ -290,10 +294,10 @@ export default function RestaurantDetailPage() {
 
             <TabsContent value="reviews" className="mt-4">
               <div className="rounded-xl border bg-card p-6 text-center">
-                <span className="text-4xl block mb-2">⭐</span>
-                <h3 className="font-semibold">Henüz yorum yok</h3>
+                <MessageSquare className="mx-auto h-10 w-10 text-muted-foreground/30 mb-3" />
+                <h3 className="font-semibold">Henuz yorum yok</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  İlk yorumu sen yap!
+                  Ilk yorumu sen yap!
                 </p>
               </div>
             </TabsContent>

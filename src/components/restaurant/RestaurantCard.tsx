@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Star, Clock, Bike, Heart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { getCuisineIcon } from "@/lib/icons";
 import type { Restaurant } from "@/types";
 
 interface RestaurantCardProps {
@@ -19,43 +20,28 @@ export default function RestaurantCard({
 }: RestaurantCardProps) {
   const isOpen = true; // TODO: calculate from hours
   const hasDiscount = restaurant.delivery.fee === 0;
+  const CuisineIcon = getCuisineIcon(restaurant.cuisine[0]);
 
   return (
     <Link
       href={`/restaurant/${restaurant.slug}`}
       className="group block overflow-hidden rounded-2xl border bg-card transition-all hover:shadow-lg hover:-translate-y-0.5"
     >
-      {/* Image */}
-      <div className="relative aspect-[16/9] bg-muted overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center text-5xl text-muted-foreground/20 transition-transform group-hover:scale-110">
-          {restaurant.cuisine[0] === "Burger"
-            ? "🍔"
-            : restaurant.cuisine[0] === "Pizza"
-              ? "🍕"
-              : restaurant.cuisine[0] === "Kebap"
-                ? "🥙"
-                : restaurant.cuisine[0] === "Pide"
-                  ? "🫓"
-                  : restaurant.cuisine[0] === "Tavuk"
-                    ? "🍗"
-                    : restaurant.cuisine[0] === "Balık"
-                      ? "🐟"
-                      : restaurant.cuisine[0] === "Döner"
-                        ? "🌯"
-                        : restaurant.cuisine[0] === "Ev Yemekleri"
-                          ? "🍲"
-                          : "🍽️"}
+      {/* Image Placeholder */}
+      <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/[0.06] via-primary/[0.03] to-muted overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <CuisineIcon className="h-12 w-12 text-primary/15 transition-transform group-hover:scale-110" strokeWidth={1.2} />
         </div>
         {!isOpen && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
             <span className="rounded-full bg-background px-4 py-1.5 text-sm font-medium">
-              Kapalı
+              Kapali
             </span>
           </div>
         )}
         {hasDiscount && (
           <Badge className="absolute left-3 top-3 z-10 bg-primary">
-            Ücretsiz Teslimat
+            Ucretsiz Teslimat
           </Badge>
         )}
         {onToggleFavorite && (
@@ -85,7 +71,7 @@ export default function RestaurantCard({
               {restaurant.name}
             </h3>
             <p className="mt-0.5 text-xs text-muted-foreground truncate">
-              {restaurant.cuisine.join(" • ")}
+              {restaurant.cuisine.join(" \u2022 ")}
             </p>
           </div>
           <div className="flex items-center gap-1 shrink-0 rounded-lg bg-primary/10 px-2 py-1">
@@ -106,11 +92,11 @@ export default function RestaurantCard({
             <Bike className="h-3.5 w-3.5" />
             <span>
               {restaurant.delivery.fee === 0
-                ? "Ücretsiz"
-                : `₺${restaurant.delivery.fee.toFixed(2)}`}
+                ? "Ucretsiz"
+                : `\u20BA${restaurant.delivery.fee.toFixed(2)}`}
             </span>
           </div>
-          <span>Min. ₺{restaurant.delivery.minOrder}</span>
+          <span>Min. \u20BA{restaurant.delivery.minOrder}</span>
         </div>
       </div>
     </Link>

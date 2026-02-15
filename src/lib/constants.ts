@@ -4,18 +4,18 @@ export const APP_DESCRIPTION =
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://neyisek.com";
 
 export const CATEGORIES = [
-  { id: "burger", name: "Burger", icon: "🍔", slug: "burger" },
-  { id: "pizza", name: "Pizza", icon: "🍕", slug: "pizza" },
-  { id: "kebap", name: "Kebap", icon: "🥙", slug: "kebap" },
-  { id: "doner", name: "Döner", icon: "🌯", slug: "doner" },
-  { id: "pide", name: "Pide & Lahmacun", icon: "🫓", slug: "pide" },
-  { id: "tavuk", name: "Tavuk", icon: "🍗", slug: "tavuk" },
-  { id: "balik", name: "Balık", icon: "🐟", slug: "balik" },
-  { id: "ev-yemekleri", name: "Ev Yemekleri", icon: "🍲", slug: "ev-yemekleri" },
-  { id: "tatli", name: "Tatlı", icon: "🍰", slug: "tatli" },
-  { id: "kahvalti", name: "Kahvaltı", icon: "🥐", slug: "kahvalti" },
-  { id: "icecek", name: "İçecek", icon: "🥤", slug: "icecek" },
-  { id: "dunya", name: "Dünya Mutfağı", icon: "🌍", slug: "dunya" },
+  { id: "burger", name: "Burger", slug: "burger" },
+  { id: "pizza", name: "Pizza", slug: "pizza" },
+  { id: "kebap", name: "Kebap", slug: "kebap" },
+  { id: "doner", name: "Döner", slug: "doner" },
+  { id: "pide", name: "Pide & Lahmacun", slug: "pide" },
+  { id: "tavuk", name: "Tavuk", slug: "tavuk" },
+  { id: "balik", name: "Balık", slug: "balik" },
+  { id: "ev-yemekleri", name: "Ev Yemekleri", slug: "ev-yemekleri" },
+  { id: "tatli", name: "Tatlı", slug: "tatli" },
+  { id: "kahvalti", name: "Kahvaltı", slug: "kahvalti" },
+  { id: "icecek", name: "İçecek", slug: "icecek" },
+  { id: "dunya", name: "Dünya Mutfağı", slug: "dunya" },
 ] as const;
 
 export const ORDER_STATUSES = {

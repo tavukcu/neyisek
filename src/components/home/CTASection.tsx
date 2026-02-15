@@ -7,51 +7,49 @@ import { motion } from "framer-motion";
 
 export default function CTASection() {
   return (
-    <section className="py-12 md:py-16 bg-primary/5">
+    <section className="py-14 md:py-20">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {/* Restaurant CTA */}
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="rounded-2xl border bg-card p-8 transition-all hover:shadow-lg"
+            transition={{ duration: 0.4 }}
+            className="rounded-2xl border bg-card p-8 transition-all hover:shadow-md"
           >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-              <Store className="h-6 w-6 text-primary" />
+            <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/[0.06]">
+              <Store className="h-5 w-5 text-primary" strokeWidth={1.8} />
             </div>
-            <h3 className="text-xl font-bold">Restoranınızı Ekleyin</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Türkiye&apos;nin en büyük yemek platformunda yerinizi alın.
-              Binlerce müşteriye ulaşın.
+            <h3 className="text-lg font-bold">Restoranınızı Ekleyin</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Türkiye&apos;nin hızla büyüyen yemek platformuna katılın.
+              Binlerce yeni müşteriye ulaşın, komisyon oranlarımızı inceleyin.
             </p>
             <Link href="/restaurant-panel">
-              <Button className="mt-4 gap-2" variant="outline">
+              <Button variant="outline" className="mt-5 gap-2 rounded-xl">
                 Başvuru Yap
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             </Link>
           </motion.div>
 
-          {/* Courier CTA */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="rounded-2xl border bg-card p-8 transition-all hover:shadow-lg"
+            transition={{ duration: 0.4, delay: 0.08 }}
+            className="rounded-2xl border bg-card p-8 transition-all hover:shadow-md"
           >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-              <Bike className="h-6 w-6 text-primary" />
+            <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/[0.06]">
+              <Bike className="h-5 w-5 text-primary" strokeWidth={1.8} />
             </div>
-            <h3 className="text-xl font-bold">Kurye Ol</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Kendi programınızı kendiniz belirleyin.
-              Esnek çalışma saatleri ve rekabetçi kazanç.
+            <h3 className="text-lg font-bold">Kurye Ol</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Kendi programınızı belirleyin, esnek çalışma saatleri ile
+              rekabetçi kazanç elde edin. Hemen başvurun.
             </p>
             <Link href="/courier">
-              <Button className="mt-4 gap-2" variant="outline">
+              <Button variant="outline" className="mt-5 gap-2 rounded-xl">
                 Başvuru Yap
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             </Link>
           </motion.div>

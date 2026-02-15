@@ -2,7 +2,7 @@
 
 import { useState, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, X, SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -113,13 +113,13 @@ function MenuContent() {
         <div className="flex items-center gap-2">
           <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
             <SelectTrigger className="w-[160px] rounded-xl">
-              <SelectValue placeholder="Sırala" />
+              <SelectValue placeholder="Sirala" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="rating">En Yüksek Puan</SelectItem>
-              <SelectItem value="delivery">En Hızlı Teslimat</SelectItem>
-              <SelectItem value="minOrder">En Düşük Minimum</SelectItem>
-              <SelectItem value="name">İsme Göre</SelectItem>
+              <SelectItem value="rating">En Yuksek Puan</SelectItem>
+              <SelectItem value="delivery">En Hizli Teslimat</SelectItem>
+              <SelectItem value="minOrder">En Dusuk Minimum</SelectItem>
+              <SelectItem value="name">Isme Gore</SelectItem>
             </SelectContent>
           </Select>
 
@@ -141,7 +141,7 @@ function MenuContent() {
           className="cursor-pointer shrink-0 rounded-full px-4 py-1.5 text-sm"
           onClick={() => setSelectedCategory("")}
         >
-          Tümü
+          Tumu
         </Badge>
         {CATEGORIES.map((cat) => (
           <Badge
@@ -152,7 +152,6 @@ function MenuContent() {
               setSelectedCategory(selectedCategory === cat.slug ? "" : cat.slug)
             }
           >
-            <span className="mr-1">{cat.icon}</span>
             {cat.name}
           </Badge>
         ))}
@@ -172,13 +171,13 @@ function MenuContent() {
                 variant="outline"
                 className="cursor-pointer rounded-full px-3 py-1"
               >
-                Ücretsiz Teslimat
+                Ucretsiz Teslimat
               </Badge>
               <Badge
                 variant="outline"
                 className="cursor-pointer rounded-full px-3 py-1"
               >
-                Kredi Kartı
+                Kredi Karti
               </Badge>
               <Badge
                 variant="outline"
@@ -190,7 +189,7 @@ function MenuContent() {
                 variant="outline"
                 className="cursor-pointer rounded-full px-3 py-1"
               >
-                30 dk Altı
+                30 dk Alti
               </Badge>
             </div>
           </motion.div>
@@ -213,10 +212,10 @@ function MenuContent() {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <span className="text-5xl mb-4">🔍</span>
-          <h3 className="text-lg font-semibold">Restoran bulunamadı</h3>
+          <SearchX className="h-12 w-12 text-muted-foreground/30 mb-4" />
+          <h3 className="text-lg font-semibold">Restoran bulunamadi</h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            Farklı bir arama terimi veya filtre deneyin
+            Farkli bir arama terimi veya filtre deneyin
           </p>
           <Button
             variant="outline"

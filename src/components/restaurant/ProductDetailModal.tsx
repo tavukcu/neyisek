@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/stores/cart.store";
+import { getCategoryIcon } from "@/lib/icons";
 import type { Product } from "@/types";
 import { toast } from "sonner";
 
@@ -33,6 +34,8 @@ export default function ProductDetailModal({
   const addItem = useCartStore((s) => s.addItem);
 
   if (!product) return null;
+
+  const CategoryIcon = getCategoryIcon(product.categoryId);
 
   const basePrice = selectedVariant
     ? (product.variants.find((v) => v.id === selectedVariant)?.price || product.price)
@@ -77,14 +80,8 @@ export default function ProductDetailModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto p-0">
         {/* Image */}
-        <div className="relative aspect-video bg-muted flex items-center justify-center text-6xl">
-          {product.categoryId === "burger"
-            ? "🍔"
-            : product.categoryId === "kebap"
-              ? "🥙"
-              : product.categoryId === "icecekler"
-                ? "🥤"
-                : "🍽️"}
+        <div className="relative aspect-video bg-gradient-to-br from-primary/[0.08] via-primary/[0.04] to-muted flex items-center justify-center">
+          <CategoryIcon className="h-16 w-16 text-primary/15" strokeWidth={1} />
           <button
             onClick={onClose}
             className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 backdrop-blur"
@@ -129,7 +126,7 @@ export default function ProductDetailModal({
             <>
               <Separator />
               <div>
-                <h4 className="text-sm font-semibold mb-2">Boyut Seçin</h4>
+                <h4 className="text-sm font-semibold mb-2">Boyut Secin</h4>
                 <div className="space-y-2">
                   <label className="flex items-center justify-between rounded-lg border p-3 cursor-pointer hover:border-primary/50 transition-colors">
                     <div className="flex items-center gap-2">
@@ -143,7 +140,7 @@ export default function ProductDetailModal({
                       <span className="text-sm">Normal</span>
                     </div>
                     <span className="text-sm font-medium">
-                      ₺{product.price.toFixed(2)}
+                      {"\u20BA"}{product.price.toFixed(2)}
                     </span>
                   </label>
                   {product.variants.map((variant) => (
@@ -162,7 +159,7 @@ export default function ProductDetailModal({
                         <span className="text-sm">{variant.name}</span>
                       </div>
                       <span className="text-sm font-medium">
-                        ₺{variant.price.toFixed(2)}
+                        {"\u20BA"}{variant.price.toFixed(2)}
                       </span>
                     </label>
                   ))}
@@ -177,7 +174,7 @@ export default function ProductDetailModal({
               <Separator />
               <div>
                 <h4 className="text-sm font-semibold mb-2">
-                  Ekstralar <span className="font-normal text-muted-foreground">(İsteğe bağlı)</span>
+                  Ekstralar <span className="font-normal text-muted-foreground">(Istege bagli)</span>
                 </h4>
                 <div className="space-y-2">
                   {product.extras.map((extra) => (
@@ -195,7 +192,7 @@ export default function ProductDetailModal({
                         <span className="text-sm">{extra.name}</span>
                       </div>
                       <span className="text-sm font-medium">
-                        +₺{extra.price.toFixed(2)}
+                        +{"\u20BA"}{extra.price.toFixed(2)}
                       </span>
                     </label>
                   ))}
@@ -207,11 +204,11 @@ export default function ProductDetailModal({
           {/* Notes */}
           <Separator />
           <div>
-            <h4 className="text-sm font-semibold mb-2">Sipariş Notu</h4>
+            <h4 className="text-sm font-semibold mb-2">Siparis Notu</h4>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Örn: Acısız olsun, sos az olsun..."
+              placeholder="Orn: Acisiz olsun, sos az olsun..."
               rows={2}
               className="w-full rounded-lg border bg-background p-3 text-sm outline-none focus:border-primary/50 resize-none"
             />
@@ -242,7 +239,7 @@ export default function ProductDetailModal({
               className="flex-1 rounded-xl h-11 text-base"
               onClick={handleAddToCart}
             >
-              Sepete Ekle · ₺{totalPrice.toFixed(2)}
+              Sepete Ekle {"\u00B7"} {"\u20BA"}{totalPrice.toFixed(2)}
             </Button>
           </div>
         </div>
