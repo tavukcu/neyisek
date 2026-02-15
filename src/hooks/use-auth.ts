@@ -23,8 +23,12 @@ export function useAuth() {
     useAuthStore();
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
+      if (firebaseUser && db) {
         const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
         if (userDoc.exists()) {
           setUser({ id: firebaseUser.uid, ...userDoc.data() } as User);
@@ -52,6 +56,7 @@ export function useAuth() {
   }, [setUser, setLoading]);
 
   const loginWithEmail = async (email: string, password: string) => {
+    if (!auth) throw new Error("Firebase not initialized");
     setLoading(true);
     const result = await signInWithEmailAndPassword(auth, email, password);
     return result.user;
@@ -62,6 +67,7 @@ export function useAuth() {
     password: string,
     displayName: string
   ) => {
+    if (!auth) throw new Error("Firebase not initialized");
     setLoading(true);
     const result = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(result.user, { displayName });
@@ -69,17 +75,20 @@ export function useAuth() {
   };
 
   const loginWithGoogle = async () => {
+    if (!auth) throw new Error("Firebase not initialized");
     setLoading(true);
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
   };
 
   const logout = async () => {
+    if (!auth) return;
     await signOut(auth);
     storeLogout();
   };
 
   const resetPassword = async (email: string) => {
+    if (!auth) throw new Error("Firebase not initialized");
     await sendPasswordResetEmail(auth, email);
   };
 
