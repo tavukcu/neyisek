@@ -5,7 +5,6 @@ import {
   getDocs,
   query,
   where,
-  orderBy,
   limit,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -14,32 +13,19 @@ import type { Product } from "@/types";
 export async function getProductsByRestaurant(restaurantId: string): Promise<Product[]> {
   if (!db) return [];
 
-  try {
-    const q = query(
-      collection(db, "restaurants", restaurantId, "products"),
-      where("isActive", "==", true),
-      orderBy("categoryId"),
-      orderBy("name")
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Product);
-  } catch (err) {
-    if (String(err).includes("index")) {
-      // Fallback: get all active products, sort client-side
-      const q = query(
-        collection(db, "restaurants", restaurantId, "products"),
-        where("isActive", "==", true)
-      );
-      const snapshot = await getDocs(q);
-      const products = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Product);
-      products.sort((a, b) => {
-        const catComp = a.categoryId.localeCompare(b.categoryId);
-        return catComp !== 0 ? catComp : a.name.localeCompare(b.name, "tr");
-      });
-      return products;
-    }
-    throw err;
-  }
+  const q = query(
+    collection(db, "restaurants", restaurantId, "products"),
+    where("isActive", "==", true)
+  );
+  const snapshot = await getDocs(q);
+  const products = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Product);
+
+  // Client-side sort by category then name
+  products.sort((a, b) => {
+    const catComp = a.categoryId.localeCompare(b.categoryId);
+    return catComp !== 0 ? catComp : a.name.localeCompare(b.name, "tr");
+  });
+  return products;
 }
 
 export async function getProductById(
