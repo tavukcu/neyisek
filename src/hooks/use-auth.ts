@@ -11,12 +11,18 @@ import {
   sendPasswordResetEmail,
   updateProfile,
 } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { useAuthStore } from "@/stores/auth.store";
-import type { User } from "@/types";
+import type { User, UserRole } from "@/types";
 
 const googleProvider = new GoogleAuthProvider();
+
+const ADMIN_EMAILS = ["halildincer1@gmail.com"];
+
+function getDefaultRole(email: string): UserRole {
+  return ADMIN_EMAILS.includes(email) ? "admin" : "customer";
+}
 
 export function useAuth() {
   const { user, isLoading, isAuthenticated, setUser, setLoading, logout: storeLogout } =
@@ -31,14 +37,20 @@ export function useAuth() {
       if (firebaseUser && db) {
         const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
         if (userDoc.exists()) {
+          // Mevcut kullanıcı - lastLoginAt güncelle
+          await updateDoc(doc(db, "users", firebaseUser.uid), {
+            lastLoginAt: serverTimestamp(),
+          });
           setUser({ id: firebaseUser.uid, ...userDoc.data() } as User);
         } else {
+          // Yeni kullanıcı - hesap oluştur
+          const email = firebaseUser.email || "";
           const newUser: Omit<User, "id"> = {
-            email: firebaseUser.email || "",
+            email,
             displayName: firebaseUser.displayName || "",
             phoneNumber: firebaseUser.phoneNumber || null,
             photoURL: firebaseUser.photoURL || null,
-            role: "customer",
+            role: getDefaultRole(email),
             addresses: [],
             preferences: { language: "tr", darkMode: false, notifications: true },
             createdAt: serverTimestamp() as never,
