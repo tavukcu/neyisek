@@ -1,6 +1,7 @@
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import MobileBottomNav from "@/components/common/MobileBottomNav";
+import AIChatbot from "@/components/ai/AIChatbot";
 
 export default function MainLayout({
   children,
@@ -13,6 +14,7 @@ export default function MainLayout({
       <main className="flex-1 pb-16 md:pb-0">{children}</main>
       <Footer />
       <MobileBottomNav />
+      <AIChatbot />
     </div>
   );
 }
