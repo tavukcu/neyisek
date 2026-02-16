@@ -8,6 +8,7 @@ import {
   orderBy,
   limit,
   startAfter,
+  documentId,
   type QueryConstraint,
   type DocumentData,
   type QueryDocumentSnapshot,
@@ -99,6 +100,27 @@ export async function getPopularRestaurants(count = 6): Promise<Restaurant[]> {
   const snapshot = await getDocs(q);
 
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Restaurant);
+}
+
+export async function getRestaurantsByIds(ids: string[]): Promise<Restaurant[]> {
+  if (!db || ids.length === 0) return [];
+
+  const results: Restaurant[] = [];
+
+  // Firestore 'in' query supports max 30 items
+  for (let i = 0; i < ids.length; i += 30) {
+    const chunk = ids.slice(i, i + 30);
+    const q = query(
+      collection(db, COLLECTION),
+      where(documentId(), "in", chunk)
+    );
+    const snapshot = await getDocs(q);
+    results.push(
+      ...snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Restaurant)
+    );
+  }
+
+  return results;
 }
 
 export async function searchRestaurants(searchTerm: string): Promise<Restaurant[]> {

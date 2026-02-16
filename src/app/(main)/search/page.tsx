@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Search, X, TrendingUp, Clock, SearchX } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import RestaurantCard from "@/components/restaurant/RestaurantCard";
-import { mockRestaurants } from "@/lib/mock-data";
+import { useSearchRestaurants } from "@/hooks/use-restaurants";
 import { CATEGORIES } from "@/lib/constants";
 import { getCategoryIcon } from "@/lib/icons";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,16 +24,7 @@ export default function SearchPage() {
   const [query, setQuery] = useState("");
   const [recentSearches] = useState(["Burger King", "Pizza", "Kebap"]);
 
-  const results = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase();
-    return mockRestaurants.filter(
-      (r) =>
-        r.name.toLowerCase().includes(q) ||
-        r.cuisine.some((c) => c.toLowerCase().includes(q)) ||
-        r.description.toLowerCase().includes(q)
-    );
-  }, [query]);
+  const { data: results = [], isLoading } = useSearchRestaurants(query);
 
   const showSuggestions = !query.trim();
 
@@ -141,12 +132,20 @@ export default function SearchPage() {
             exit={{ opacity: 0 }}
           >
             <p className="mb-4 text-sm text-muted-foreground">
-              {results.length > 0
+              {isLoading
+                ? "Araniyor..."
+                : results.length > 0
                 ? `"${query}" icin ${results.length} sonuc`
                 : `"${query}" icin sonuc bulunamadi`}
             </p>
 
-            {results.length > 0 ? (
+            {isLoading ? (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="h-56 animate-pulse rounded-2xl bg-muted" />
+                ))}
+              </div>
+            ) : results.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {results.map((restaurant) => (
                   <RestaurantCard key={restaurant.id} restaurant={restaurant} />

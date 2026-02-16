@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import RestaurantCard from "@/components/restaurant/RestaurantCard";
 import { CATEGORIES } from "@/lib/constants";
-import { mockRestaurants } from "@/lib/mock-data";
+import { useRestaurants } from "@/hooks/use-restaurants";
 import { motion, AnimatePresence } from "framer-motion";
 
 type SortOption = "rating" | "delivery" | "minOrder" | "name";
@@ -36,10 +36,24 @@ function MenuContent() {
   const [sortBy, setSortBy] = useState<SortOption>("rating");
   const [showFilters, setShowFilters] = useState(false);
 
-  const filteredRestaurants = useMemo(() => {
-    let result = [...mockRestaurants];
+  const sortByMap: Record<SortOption, "rating" | "deliveryTime" | "minOrder" | undefined> = {
+    rating: "rating",
+    delivery: "deliveryTime",
+    minOrder: "minOrder",
+    name: undefined,
+  };
 
-    // Filter by search
+  const { data: restaurants = [], isLoading } = useRestaurants({
+    cuisine: selectedCategory
+      ? CATEGORIES.find((c) => c.slug === selectedCategory)?.name
+      : undefined,
+    sortBy: sortByMap[sortBy],
+  });
+
+  const filteredRestaurants = useMemo(() => {
+    let result = [...restaurants];
+
+    // Filter by search (client-side for responsiveness)
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(
@@ -50,34 +64,13 @@ function MenuContent() {
       );
     }
 
-    // Filter by category
-    if (selectedCategory) {
-      const cat = CATEGORIES.find((c) => c.slug === selectedCategory);
-      if (cat) {
-        result = result.filter((r) =>
-          r.cuisine.some((c) => c.toLowerCase().includes(cat.name.toLowerCase().split(" ")[0]))
-        );
-      }
-    }
-
-    // Sort
-    switch (sortBy) {
-      case "rating":
-        result.sort((a, b) => b.rating.average - a.rating.average);
-        break;
-      case "delivery":
-        result.sort((a, b) => a.delivery.estimatedTime - b.delivery.estimatedTime);
-        break;
-      case "minOrder":
-        result.sort((a, b) => a.delivery.minOrder - b.delivery.minOrder);
-        break;
-      case "name":
-        result.sort((a, b) => a.name.localeCompare(b.name, "tr"));
-        break;
+    // Sort by name (client-side, not supported by Firestore query)
+    if (sortBy === "name") {
+      result.sort((a, b) => a.name.localeCompare(b.name, "tr"));
     }
 
     return result;
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [restaurants, searchQuery, sortBy]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
@@ -85,7 +78,7 @@ function MenuContent() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold md:text-3xl">Restoranlar</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {filteredRestaurants.length} restoran bulundu
+          {isLoading ? "Yukleniyor..." : `${filteredRestaurants.length} restoran bulundu`}
         </p>
       </div>
 
@@ -196,8 +189,14 @@ function MenuContent() {
         )}
       </AnimatePresence>
 
-      {/* Restaurant Grid */}
-      {filteredRestaurants.length > 0 ? (
+      {/* Loading Skeleton */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-56 animate-pulse rounded-2xl bg-muted" />
+          ))}
+        </div>
+      ) : filteredRestaurants.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredRestaurants.map((restaurant, index) => (
             <motion.div

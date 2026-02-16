@@ -3,11 +3,31 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import RestaurantCard from "@/components/restaurant/RestaurantCard";
-import { mockRestaurants } from "@/lib/mock-data";
+import { usePopularRestaurants } from "@/hooks/use-restaurants";
 import { motion } from "framer-motion";
 
 export default function PopularRestaurants() {
-  const popular = mockRestaurants.slice(0, 6);
+  const { data: popular = [], isLoading } = usePopularRestaurants(6);
+
+  if (isLoading) {
+    return (
+      <section className="py-12 md:py-16">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="mb-6">
+            <div className="h-7 w-48 animate-pulse rounded-lg bg-muted" />
+            <div className="mt-2 h-4 w-64 animate-pulse rounded-lg bg-muted" />
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-56 animate-pulse rounded-2xl bg-muted" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (popular.length === 0) return null;
 
   return (
     <section className="py-12 md:py-16">

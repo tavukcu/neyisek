@@ -24,8 +24,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import ProductCard from "@/components/restaurant/ProductCard";
 import ProductDetailModal from "@/components/restaurant/ProductDetailModal";
-import { mockRestaurants, getMockProducts } from "@/lib/mock-data";
 import { getCuisineIcon } from "@/lib/icons";
+import { useRestaurantBySlug } from "@/hooks/use-restaurant";
+import { useProducts } from "@/hooks/use-products";
+import { useFavoriteIds, useToggleFavorite } from "@/hooks/use-favorites";
+import { useAuth } from "@/hooks/use-auth";
 import { useCartStore } from "@/stores/cart.store";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -37,17 +40,22 @@ export default function RestaurantDetailPage() {
   const [selectedProduct, setSelectedProduct] = useState<
     (Product & { id: string }) | null
   >(null);
-  const [isFav, setIsFav] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
+  const { user } = useAuth();
 
-  const restaurant = mockRestaurants.find((r) => r.slug === slug);
-  const products = restaurant ? getMockProducts(restaurant.id) : [];
+  const { data: restaurant, isLoading: isLoadingRestaurant } = useRestaurantBySlug(slug);
+  const { data: products = [], isLoading: isLoadingProducts } = useProducts(restaurant?.id || "");
+  const { data: favoriteIds = [] } = useFavoriteIds();
+  const toggleFavorite = useToggleFavorite();
+
+  const isFav = restaurant ? favoriteIds.includes(restaurant.id) : false;
 
   const productsByCategory = useMemo(() => {
     const grouped: Record<string, (Product & { id: string })[]> = {};
     products.forEach((p) => {
-      if (!grouped[p.categoryId]) grouped[p.categoryId] = [];
-      grouped[p.categoryId].push(p);
+      const product = p as Product & { id: string };
+      if (!grouped[product.categoryId]) grouped[product.categoryId] = [];
+      grouped[product.categoryId].push(product);
     });
     return grouped;
   }, [products]);
@@ -60,7 +68,28 @@ export default function RestaurantDetailPage() {
     pizza: "Pizzalar",
     pide: "Pideler",
     tatli: "Tatlilar",
+    tavuk: "Tavuk",
+    balik: "Balik",
+    doner: "Doner",
+    "ev-yemekleri": "Ev Yemekleri",
   };
+
+  // Loading skeleton
+  if (isLoadingRestaurant) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-6">
+        <div className="mb-4 h-4 w-24 animate-pulse rounded bg-muted" />
+        <div className="rounded-2xl border bg-card overflow-hidden">
+          <div className="h-48 md:h-64 animate-pulse bg-muted" />
+          <div className="p-6 space-y-3">
+            <div className="h-7 w-48 animate-pulse rounded bg-muted" />
+            <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+            <div className="h-4 w-64 animate-pulse rounded bg-muted" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!restaurant) {
     return (
@@ -91,6 +120,21 @@ export default function RestaurantDetailPage() {
       extras: [],
     });
     toast.success(`${product.name} sepete eklendi!`);
+  };
+
+  const handleToggleFav = () => {
+    if (!user) {
+      toast.error("Favorilere eklemek icin giris yapin");
+      return;
+    }
+    toggleFavorite.mutate(
+      { restaurantId: restaurant.id, isFavorite: isFav },
+      {
+        onSuccess: () => {
+          toast.success(isFav ? "Favorilerden cikarildi" : "Favorilere eklendi");
+        },
+      }
+    );
   };
 
   return (
@@ -133,10 +177,7 @@ export default function RestaurantDetailPage() {
                 variant="secondary"
                 size="icon"
                 className="rounded-full h-9 w-9 bg-white/80 backdrop-blur hover:bg-white"
-                onClick={() => {
-                  setIsFav(!isFav);
-                  toast.success(isFav ? "Favorilerden cikarildi" : "Favorilere eklendi");
-                }}
+                onClick={handleToggleFav}
               >
                 <Heart
                   className={`h-4 w-4 ${isFav ? "fill-red-500 text-red-500" : "text-gray-700"}`}
@@ -221,28 +262,38 @@ export default function RestaurantDetailPage() {
             </TabsList>
 
             <TabsContent value="menu" className="mt-4 space-y-6">
-              {Object.entries(productsByCategory).map(([categoryId, items]) => (
-                <div key={categoryId}>
-                  <h2 className="text-lg font-semibold mb-3">
-                    {categoryNames[categoryId] || categoryId}
-                  </h2>
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {items.map((product) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                        onAddToCart={handleQuickAdd}
-                        onOpenDetail={setSelectedProduct}
-                      />
-                    ))}
-                  </div>
+              {isLoadingProducts ? (
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="h-28 animate-pulse rounded-2xl bg-muted" />
+                  ))}
                 </div>
-              ))}
-              {products.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground">
-                  <ClipboardList className="mx-auto h-10 w-10 text-muted-foreground/30 mb-3" />
-                  <p className="text-sm">Henuz menu eklenmemis</p>
-                </div>
+              ) : (
+                <>
+                  {Object.entries(productsByCategory).map(([categoryId, items]) => (
+                    <div key={categoryId}>
+                      <h2 className="text-lg font-semibold mb-3">
+                        {categoryNames[categoryId] || categoryId}
+                      </h2>
+                      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                        {items.map((product) => (
+                          <ProductCard
+                            key={product.id}
+                            product={product}
+                            onAddToCart={handleQuickAdd}
+                            onOpenDetail={setSelectedProduct}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  {products.length === 0 && (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <ClipboardList className="mx-auto h-10 w-10 text-muted-foreground/30 mb-3" />
+                      <p className="text-sm">Henuz menu eklenmemis</p>
+                    </div>
+                  )}
+                </>
               )}
             </TabsContent>
 

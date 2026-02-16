@@ -10,7 +10,6 @@ import {
   ChevronRight,
   ArrowLeft,
   Plus,
-  Check,
   ShoppingBag,
   Shield,
   Clock,
@@ -19,8 +18,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/stores/cart.store";
-import { useAddressStore } from "@/stores/address.store";
-import { useOrderStore } from "@/stores/order.store";
+import { useAddresses } from "@/hooks/use-addresses";
+import { useCreateOrder } from "@/hooks/use-orders";
+import { useAuth } from "@/hooks/use-auth";
 import { DELIVERY_FEE_DEFAULT, SERVICE_FEE_RATE, MIN_ORDER_AMOUNT } from "@/lib/constants";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -28,9 +28,10 @@ import type { PaymentMethod } from "@/types";
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const { items, getSubtotal, clearCart, restaurantId } = useCartStore();
-  const { addresses } = useAddressStore();
-  const { createOrder } = useOrderStore();
+  const { addresses } = useAddresses();
+  const createOrder = useCreateOrder();
 
   const [selectedAddressId, setSelectedAddressId] = useState(
     addresses.find((a) => a.isDefault)?.id || addresses[0]?.id || ""
@@ -71,37 +72,50 @@ export default function CheckoutPage() {
       toast.error(`Minimum siparis tutari \u20BA${MIN_ORDER_AMOUNT}`);
       return;
     }
+    if (!user) {
+      toast.error("Siparis vermek icin giris yapin");
+      return;
+    }
 
     setIsProcessing(true);
 
-    // Simulate payment processing
-    await new Promise((r) => setTimeout(r, 1500));
+    try {
+      // Simulate payment processing
+      await new Promise((r) => setTimeout(r, 1500));
 
-    const order = createOrder({
-      restaurantId: restaurantId || "",
-      restaurantName: "Restoran",
-      items: items.map((item) => ({
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        extras: item.extras.map((e) => ({ name: e.name, price: e.price })),
-      })),
-      pricing: { subtotal, deliveryFee, serviceFee, discount, total },
-      payment: {
-        method: paymentMethod,
-        status: paymentMethod === "cash" ? "pending" : "paid",
-      },
-      delivery: {
-        address: selectedAddress.address,
-        estimatedTime: 30,
-      },
-      status: "pending",
-    });
+      const orderId = await createOrder.mutateAsync({
+        customerId: user.id,
+        restaurantId: restaurantId || "",
+        restaurantName: "Restoran",
+        items: items.map((item) => ({
+          productId: item.productId,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          extras: item.extras.map((e) => ({ id: e.id || "", name: e.name, price: e.price })),
+        })),
+        pricing: { subtotal, deliveryFee, serviceFee, discount, total },
+        payment: {
+          method: paymentMethod,
+          status: paymentMethod === "cash" ? "pending" : "paid",
+        },
+        delivery: {
+          address: selectedAddress.address,
+          lat: selectedAddress.lat,
+          lng: selectedAddress.lng,
+          estimatedTime: 30,
+        },
+        status: "pending",
+      } as never);
 
-    clearCart();
-    setIsProcessing(false);
-    toast.success("Siparisiniz alindi!");
-    router.push(`/orders/${order.id}`);
+      clearCart();
+      toast.success("Siparisiniz alindi!");
+      router.push(`/orders/${orderId}`);
+    } catch {
+      toast.error("Siparis olusturulamadi");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (

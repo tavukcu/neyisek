@@ -14,10 +14,11 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { useAddressStore } from "@/stores/address.store";
+import { useAddresses } from "@/hooks/use-addresses";
+import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 const quickTitles = [
   { label: "Ev", icon: Home },
@@ -26,8 +27,15 @@ const quickTitles = [
 ];
 
 export default function AddressesPage() {
-  const { addresses, addAddress, updateAddress, removeAddress, setDefault } =
-    useAddressStore();
+  const { isAuthenticated } = useAuth();
+  const {
+    addresses,
+    isLoading,
+    addAddress,
+    updateAddress,
+    removeAddress,
+    setDefault,
+  } = useAddresses();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -44,34 +52,38 @@ export default function AddressesPage() {
     setEditingId(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.address.trim() || !form.city.trim() || !form.district.trim()) {
       toast.error("Lutfen tum alanlari doldurun");
       return;
     }
 
-    if (editingId) {
-      updateAddress(editingId, {
-        title: form.title,
-        address: form.address,
-        city: form.city,
-        district: form.district,
-        isDefault: form.isDefault,
-      });
-      toast.success("Adres guncellendi");
-    } else {
-      addAddress({
-        title: form.title,
-        address: form.address,
-        city: form.city,
-        district: form.district,
-        lat: 41.0 + Math.random() * 0.1,
-        lng: 29.0 + Math.random() * 0.1,
-        isDefault: form.isDefault,
-      });
-      toast.success("Adres eklendi");
+    try {
+      if (editingId) {
+        await updateAddress(editingId, {
+          title: form.title,
+          address: form.address,
+          city: form.city,
+          district: form.district,
+          isDefault: form.isDefault,
+        });
+        toast.success("Adres guncellendi");
+      } else {
+        await addAddress({
+          title: form.title,
+          address: form.address,
+          city: form.city,
+          district: form.district,
+          lat: 41.0 + Math.random() * 0.1,
+          lng: 29.0 + Math.random() * 0.1,
+          isDefault: form.isDefault,
+        });
+        toast.success("Adres eklendi");
+      }
+      resetForm();
+    } catch {
+      toast.error("Bir hata olustu");
     }
-    resetForm();
   };
 
   const handleEdit = (addr: typeof addresses[0]) => {
@@ -86,10 +98,29 @@ export default function AddressesPage() {
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => {
-    removeAddress(id);
-    toast.success("Adres silindi");
+  const handleDelete = async (id: string) => {
+    try {
+      await removeAddress(id);
+      toast.success("Adres silindi");
+    } catch {
+      toast.error("Bir hata olustu");
+    }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-20 text-center">
+        <MapPin className="mx-auto h-16 w-16 text-muted-foreground/30 mb-4" />
+        <h1 className="text-2xl font-bold">Adreslerim</h1>
+        <p className="mt-2 text-muted-foreground">
+          Adreslerinizi gormek icin giris yapin
+        </p>
+        <Link href="/login">
+          <Button className="mt-6">Giris Yap</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-lg px-4 py-6">
@@ -97,7 +128,7 @@ export default function AddressesPage() {
         <div>
           <h1 className="text-2xl font-bold">Adreslerim</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {addresses.length} kayitli adres
+            {isLoading ? "Yukleniyor..." : `${addresses.length} kayitli adres`}
           </p>
         </div>
         {!showForm && (
@@ -194,88 +225,99 @@ export default function AddressesPage() {
         )}
       </AnimatePresence>
 
-      {/* Address List */}
-      <div className="space-y-3">
-        <AnimatePresence>
-          {addresses.map((addr) => (
-            <motion.div
-              key={addr.id}
-              layout
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              className="rounded-xl border bg-card p-4"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
-                    <MapPin className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold">{addr.title}</span>
-                      {addr.isDefault && (
-                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                          <Star className="mr-0.5 h-2.5 w-2.5" />
-                          Varsayilan
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
-                      {addr.address}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {addr.district}, {addr.city}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  {!addr.isDefault && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-primary"
-                      onClick={() => {
-                        setDefault(addr.id);
-                        toast.success("Varsayilan adres degistirildi");
-                      }}
-                    >
-                      <Star className="h-3.5 w-3.5" />
-                    </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-primary"
-                    onClick={() => handleEdit(addr)}
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                    onClick={() => handleDelete(addr.id)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
+      {/* Loading Skeleton */}
+      {isLoading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="h-24 animate-pulse rounded-xl bg-muted" />
           ))}
-        </AnimatePresence>
+        </div>
+      ) : (
+        <>
+          {/* Address List */}
+          <div className="space-y-3">
+            <AnimatePresence>
+              {addresses.map((addr) => (
+                <motion.div
+                  key={addr.id}
+                  layout
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className="rounded-xl border bg-card p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
+                        <MapPin className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold">{addr.title}</span>
+                          {addr.isDefault && (
+                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                              <Star className="mr-0.5 h-2.5 w-2.5" />
+                              Varsayilan
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
+                          {addr.address}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {addr.district}, {addr.city}
+                        </p>
+                      </div>
+                    </div>
 
-        {addresses.length === 0 && !showForm && (
-          <div className="text-center py-12">
-            <MapPin className="mx-auto h-12 w-12 text-muted-foreground/30 mb-3" />
-            <h3 className="font-semibold">Henuz adres eklenmemis</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Teslimat adresi ekleyerek siparis vermeye baslayabilirsiniz
-            </p>
+                    <div className="flex items-center gap-1">
+                      {!addr.isDefault && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-primary"
+                          onClick={() => {
+                            setDefault(addr.id);
+                            toast.success("Varsayilan adres degistirildi");
+                          }}
+                        >
+                          <Star className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-primary"
+                        onClick={() => handleEdit(addr)}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        onClick={() => handleDelete(addr.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+
+            {addresses.length === 0 && !showForm && (
+              <div className="text-center py-12">
+                <MapPin className="mx-auto h-12 w-12 text-muted-foreground/30 mb-3" />
+                <h3 className="font-semibold">Henuz adres eklenmemis</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Teslimat adresi ekleyerek siparis vermeye baslayabilirsiniz
+                </p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 }

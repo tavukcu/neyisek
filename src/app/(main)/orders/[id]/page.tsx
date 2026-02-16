@@ -22,8 +22,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useOrderStore } from "@/stores/order.store";
+import { useOrder } from "@/hooks/use-orders";
 import { ORDER_STATUSES } from "@/lib/constants";
+import { formatDate, formatTime } from "@/lib/date-utils";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -53,32 +54,30 @@ const timelineColors: Record<string, string> = {
   cancelled: "bg-red-500",
 };
 
-function formatTime(dateStr: string) {
-  return new Date(dateStr).toLocaleTimeString("tr-TR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function formatFullDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("tr-TR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 export default function OrderDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { getOrder } = useOrderStore();
-  const order = getOrder(id);
+  const { order, isLoading } = useOrder(id);
   const [copied, setCopied] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-6">
+        <div className="mb-4 h-4 w-24 animate-pulse rounded bg-muted" />
+        <div className="mb-5 space-y-2">
+          <div className="h-8 w-48 animate-pulse rounded bg-muted" />
+          <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="space-y-5">
+          <div className="h-48 animate-pulse rounded-xl bg-muted" />
+          <div className="h-64 animate-pulse rounded-xl bg-muted" />
+        </div>
+      </div>
+    );
+  }
 
   if (!order) {
     return (
@@ -97,6 +96,7 @@ export default function OrderDetailPage({
 
   const statusInfo = ORDER_STATUSES[order.status as OrderStatus];
   const isActive = !["delivered", "cancelled"].includes(order.status);
+  const restaurantName = (order as unknown as { restaurantName?: string }).restaurantName || "Restoran";
 
   const handleCopyOrderNumber = () => {
     navigator.clipboard.writeText(order.orderNumber);
@@ -124,7 +124,7 @@ export default function OrderDetailPage({
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold">{order.restaurantName}</h1>
+            <h1 className="text-2xl font-bold">{restaurantName}</h1>
             <div className="flex items-center gap-2 mt-1">
               <button
                 onClick={handleCopyOrderNumber}
@@ -139,7 +139,7 @@ export default function OrderDetailPage({
               </button>
               <span className="text-muted-foreground">&middot;</span>
               <span className="text-xs text-muted-foreground">
-                {formatFullDate(order.createdAt)}
+                {formatDate(order.createdAt)}
               </span>
             </div>
           </div>
