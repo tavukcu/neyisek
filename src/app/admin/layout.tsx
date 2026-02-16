@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   LayoutDashboard,
@@ -19,10 +19,12 @@ import {
   ChevronLeft,
   Bell,
   Shield,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAdminStore } from "@/stores/admin.store";
+import { useAuth } from "@/hooks/use-auth";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -39,9 +41,32 @@ const navItems = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { restaurants } = useAdminStore();
+  const { user, isLoading } = useAuth();
   const pendingCount = restaurants.filter((r) => r.status === "pending").length;
+
+  // Auth guard: loading state
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  // Auth guard: giriş yapmamış → login'e yönlendir
+  if (!user) {
+    router.replace("/login");
+    return null;
+  }
+
+  // Auth guard: admin değil → ana sayfaya yönlendir
+  if (user.role !== "admin") {
+    router.replace("/");
+    return null;
+  }
 
   const isActive = (href: string) => {
     if (href === "/admin") return pathname === href;
