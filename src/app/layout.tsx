@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import ThemeProvider from "@/components/common/ThemeProvider";
+import PWAInstall from "@/components/common/PWAInstall";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -53,7 +55,10 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#16a34a",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ea580c" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a1a1a" },
+  ],
 };
 
 export default function RootLayout({
@@ -66,8 +71,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
-        {children}
-        <Toaster position="top-center" richColors />
+        <ThemeProvider>
+          {children}
+          <Toaster position="top-center" richColors />
+          <PWAInstall />
+        </ThemeProvider>
       </body>
     </html>
   );

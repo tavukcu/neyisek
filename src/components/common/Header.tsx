@@ -34,6 +34,7 @@ import {
 import { useCartStore } from "@/stores/cart.store";
 import { useAuthStore } from "@/stores/auth.store";
 import { useLocationStore } from "@/stores/location.store";
+import ThemeToggle from "@/components/common/ThemeToggle";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -85,6 +86,9 @@ export default function Header() {
           >
             <Search className="h-5 w-5" />
           </Button>
+
+          {/* Theme Toggle */}
+          <ThemeToggle />
 
           {/* Cart */}
           <Link href="/cart">
