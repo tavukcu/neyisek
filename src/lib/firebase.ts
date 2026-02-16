@@ -1,8 +1,11 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
-import { getFirestore, type Firestore } from "firebase/firestore";
+import {
+  getFirestore,
+  initializeFirestore,
+  type Firestore,
+} from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
-import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -18,15 +21,21 @@ function getFirebaseApp(): FirebaseApp | null {
   return getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 }
 
+function getFirestoreDb(firebaseApp: FirebaseApp): Firestore {
+  try {
+    return initializeFirestore(firebaseApp, {
+      experimentalAutoDetectLongPolling: true,
+    });
+  } catch {
+    // Already initialized, return existing instance
+    return getFirestore(firebaseApp);
+  }
+}
+
 const app = getFirebaseApp();
 
 export const auth: Auth | null = app ? getAuth(app) : null;
-export const db: Firestore | null = app ? getFirestore(app) : null;
+export const db: Firestore | null = app ? getFirestoreDb(app) : null;
 export const storage: FirebaseStorage | null = app ? getStorage(app) : null;
-
-export const analytics =
-  typeof window !== "undefined" && app
-    ? isSupported().then((yes) => (yes ? getAnalytics(app) : null))
-    : null;
 
 export default app;

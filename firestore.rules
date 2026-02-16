@@ -1,0 +1,43 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Restaurants - public read
+    match /restaurants/{restaurantId} {
+      allow read: if true;
+      allow write: if false;
+
+      // Products subcollection - public read
+      match /products/{productId} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+
+    // Categories - public read
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Orders - authenticated users can read/create their own
+    match /orders/{orderId} {
+      allow read: if request.auth != null && resource.data.customerId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.customerId == request.auth.uid;
+      allow update: if false;
+    }
+
+    // User profiles and addresses
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /addresses/{addressId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      match /favorites/{favoriteId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}
